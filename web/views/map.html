@@ -1,0 +1,80 @@
+{% extends "base.html" %}{% block main %}
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=EFuQI5pXPFge8DGIflGWioivxS7KoeLI"></script>
+<style type="text/css">
+    #allmap {
+        height: 400px;
+        width: 100%;
+    }
+</style>
+
+<div class="container">
+    <div id="allmap"></div>
+</div>
+
+<div class="container" style="margin-top: 20px">
+    <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-6">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">输入位置</h3>
+                </div>
+                <div class="panel-body">
+                    <form action="/map_pos" method="post">
+                        <div class="form-group">
+                            <label>经度</label>
+                            <input type="number" name="longitude" class="form-control" value="" placeholder="Input longitude">
+                        </div>
+                        <div class="form-group">
+                            <label>纬度</label>
+                            <input type="number" name="latitude" class="form-control" placeholder="Input latitude">
+                        </div>
+                        <button type="submit" class="btn btn-primary">查询</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    // 百度地图API功能
+    var map = new BMap.Map("allmap");
+    map.centerAndZoom(new BMap.Point(116.331398, 39.897445), 15);
+    map.enableScrollWheelZoom(true);
+
+    // 用经纬度设置地图中心点
+    function theLocation() {
+        if (document.getElementById("longitude").value != "" && document.getElementById("latitude").value != "") {
+            map.clearOverlays();
+            var new_point = new BMap.Point(document.getElementById("longitude").value, document.getElementById("latitude").value);
+            var marker = new BMap.Marker(new_point); // 创建标注
+            map.addOverlay(marker); // 将标注添加到地图中
+            map.panTo(new_point);
+        }
+    }
+
+
+    var ws = new WebSocket('ws://localhost:3000/test');
+    // 响应onmessage事件:
+    ws.onmessage = function(msg) {
+        try {
+            var value = JSON.parse(msg.data);
+            alert("经度： " + value.lo + "纬度： " + value.la);
+            let new_point = new BMap.Point(value.lo, value.la);
+            let marker = new BMap.Marker(new_point);
+            map.centerAndZoom(new_point, 15);
+            map.addOverlay(marker);
+        } catch (e) {
+            alert("error! :" + e + msg.data);
+        }
+    };
+    // 给服务器发送一个字符串:
+    // setTimeout(function() {
+    //     ws.send('Hello!');
+    // }, 5000);
+</script>
+
+
+{% endblock %}

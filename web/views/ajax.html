@@ -1,0 +1,21 @@
+{% extends "base.html" %}{% block main %}
+<div id="ajax" class="container">
+    <p id="myDiv">will be change</p>
+    <button type="button" class="btn btn-info" onclick="loadXMLDoc()"></button>
+</div>
+<script>
+    function loadXMLDoc() {
+        var xmlhttp;
+        //  IE7+, Firefox, Chrome, Opera, Safari 浏览器执行代码
+        xmlhttp = new XMLHttpRequest();
+        xmlhttp.onreadystatechange = function() {
+            console.log(xmlhttp);
+            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                document.getElementById("myDiv").innerText = xmlhttp.responseText;
+            }
+        }
+        xmlhttp.open("GET", "http://localhost:3000/ajax_test", true);
+        xmlhttp.send();
+    }
+</script>
+{% endblock %}
